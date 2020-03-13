@@ -18,7 +18,13 @@ namespace CoffeeSlotMachine.Persistence
 
         public IEnumerable<Order> GetAllWithProduct()
         {
-            throw new NotImplementedException();
+            return _dbContext.Orders;
+        }
+
+        public void AddOrder(Order order)
+        {
+            _dbContext.Orders.Add(order);
+            _dbContext.SaveChanges();
         }
 
     }

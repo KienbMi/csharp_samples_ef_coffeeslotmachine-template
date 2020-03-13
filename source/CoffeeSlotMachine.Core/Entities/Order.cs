@@ -29,12 +29,12 @@ namespace CoffeeSlotMachine.Core.Entities
         /// <summary>
         /// Summe der eingeworfenen Cents.
         /// </summary>
-        public int ThrownInCents => -1;
+        public int ThrownInCents => ConvertNumbersTextToInt(ThrownInCoinValues);
 
         /// <summary>
         /// Summe der Cents die zurückgegeben werden
         /// </summary>
-        public int ReturnCents => -1;
+        public int ReturnCents => ConvertNumbersTextToInt(ReturnCoinValues);
 
 
         public int ProductId { get; set; }
@@ -46,7 +46,7 @@ namespace CoffeeSlotMachine.Core.Entities
         /// Kann der Automat mangels Kleingeld nicht
         /// mehr herausgeben, wird der Rest als Spende verbucht
         /// </summary>
-        public int DonationCents => -1;
+        public int DonationCents => ThrownInCents - (Product.PriceInCents + ReturnCents);
 
         /// <summary>
         /// Münze wird eingenommen.
@@ -55,7 +55,8 @@ namespace CoffeeSlotMachine.Core.Entities
         /// <returns>isFinished ist true, wenn der Produktpreis zumindest erreicht wurde</returns>
         public bool InsertCoin(int coinValue)
         {
-            throw new NotImplementedException();
+            ThrownInCoinValues = AddIntToNumbersText(ThrownInCoinValues, coinValue);
+            return ThrownInCents >= Product.PriceInCents ? true : false;
         }
 
         /// <summary>
@@ -66,7 +67,42 @@ namespace CoffeeSlotMachine.Core.Entities
         /// <param name="coins">Aktueller Zustand des Münzdepots</param>
         public void FinishPayment(IEnumerable<Coin> coins)
         {
-            throw new NotImplementedException();
+            foreach (Coin coin in coins)
+            {
+                while (coin.Amount > 0)
+                {
+                    coin.Amount--;
+                    ReturnCoinValues = AddIntToNumbersText(ReturnCoinValues, coin.CoinValue);
+                }
+            }
+        }
+
+        private string AddIntToNumbersText(string numbersText, int coinValue)
+        {
+            if (numbersText == null)
+                return $"{coinValue}";
+            else
+                return $"{numbersText};{coinValue}";
+        }
+
+        private int ConvertNumbersTextToInt(string numbersText)
+        {
+            int result = -1;
+
+            string[] data = numbersText?.Split(';');
+
+            if (data != null && data.Length > 0)
+            {
+                result = 0;
+                for (int i = 0; i < data.Length; i++)
+                {
+                    if (int.TryParse(data[i], out int coinValue))
+                    {
+                        result += coinValue;
+                    }
+                }
+            }
+            return result;
         }
     }
 }
