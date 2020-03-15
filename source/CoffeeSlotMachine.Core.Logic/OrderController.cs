@@ -72,34 +72,8 @@ namespace CoffeeSlotMachine.Core.Logic
             bool finished = order.InsertCoin(coinValue);
             if (finished)
             {
-                List<Coin> coins = new List<Coin>();
-
-                string[] data = order.ThrownInCoinValues?.Split(';');
-
-                if (data != null && data.Length > 0)
-                {
-                    for (int i = 0; i < data.Length; i++)
-                    {
-                        if (int.TryParse(data[i], out int value))
-                        {
-                            Coin coin = coins.Find(c => c.CoinValue == value);
-                            if (coin == null)
-                            {
-                                coins.Add(new Coin
-                                    {
-                                        Amount = 1,
-                                        CoinValue = value
-                                    }
-                                );
-                            }
-                            else
-                            {
-                                coin.Amount++;
-                            }
-                        }
-                    }
-                }
-                _coinRepository.AddCoins(coins.ToArray());
+                List<Coin> trownInCoins = ParseCoinsFromString(order.ThrownInCoinValues);
+                _coinRepository.AddCoins(trownInCoins.ToArray());
 
                 int returnCents = order.ThrownInCents - order.Product.PriceInCents;
                 Coin[] coinsInDepot = GetCoinDepot().ToArray();
@@ -126,6 +100,37 @@ namespace CoffeeSlotMachine.Core.Logic
             }
 
             return finished;
+        }
+
+        private List<Coin> ParseCoinsFromString(string thrownInCoinValues)
+        {
+            List<Coin> coins = new List<Coin>();
+            string[] data = thrownInCoinValues?.Split(';');
+
+            if (data != null && data.Length > 0)
+            {
+                for (int i = 0; i < data.Length; i++)
+                {
+                    if (int.TryParse(data[i], out int value))
+                    {
+                        Coin coin = coins.Find(c => c.CoinValue == value);
+                        if (coin == null)
+                        {
+                            coins.Add(new Coin
+                            {
+                                Amount = 1,
+                                CoinValue = value
+                            }
+                            );
+                        }
+                        else
+                        {
+                            coin.Amount++;
+                        }
+                    }
+                }
+            }
+            return coins;
         }
 
         /// <summary>
