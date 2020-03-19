@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoffeeSlotMachine.Core\CoffeeSlotMachine.Core.csproj" />
+    <ProjectReference Include="..\CoffeeSlotMachine.Persistence\CoffeeSlotMachine.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
